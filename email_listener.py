@@ -65,13 +65,12 @@ while True:
     print("===========================\n")
 
     intent = result["email_understanding"]["intent"].lower()
-    if intent != "confirmation":
 
-      send_email(
+    send_email(
         sender,
         "Meeting Response",
         result["schedule_result"]["reply"]
-    )
+)
 
     mark_as_read()
 
@@ -82,5 +81,3 @@ while True:
 
     print("Reply sent successfully.")
 
-else:
-    print(result["schedule_result"]["message"])
