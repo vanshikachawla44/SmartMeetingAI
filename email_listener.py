@@ -65,33 +65,22 @@ while True:
     print("===========================\n")
 
     intent = result["email_understanding"]["intent"].lower()
+    if intent != "confirmation":
 
-    if (
-    "schedule_result" in result
-    and "reply" in result["schedule_result"]
-):
+      send_email(
+        sender,
+        "Meeting Response",
+        result["schedule_result"]["reply"]
+    )
 
-    # Confirmation ke baad Google Calendar invitation hi enough hai
-       if intent != "confirmation":
+    mark_as_read()
 
-        send_email(
-            sender,
-            "Meeting Response",
-            result["schedule_result"]["reply"]
-        )
+    processed_ids.add(message_id)
 
+    with open("processed_emails.txt", "a") as file:
+        file.write(message_id + "\n")
 
+    print("Reply sent successfully.")
 
-        mark_as_read()
-
-        processed_ids.add(message_id)
-
-        with open("processed_emails.txt", "a") as file:
-            file.write(message_id + "\n")
-
-        print("Reply sent successfully.")
-
-    else:
-        print(result["schedule_result"]["message"])
-
-    time.sleep(30)
+else:
+    print(result["schedule_result"]["message"])

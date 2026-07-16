@@ -86,7 +86,41 @@ Regards,
 SmartMeetingAI
 """
         }
+    # ----------------------------------------
+    # Reschedule -> Don't create meeting yet
+    # ----------------------------------------
+    if email_data["intent"] == "reschedule":
 
+        pending["day"] = day
+        pending["date"] = date
+        pending["time"] = time
+
+        from services.pending_meeting_service import save_pending_meeting
+
+        save_pending_meeting(pending)
+
+        return {
+            "reply": f"""
+Hello,
+
+Your requested schedule is available.
+
+Meeting Details
+
+Date : {date}
+
+Time : {time}
+
+Please reply:
+
+YES
+
+to confirm your meeting.
+
+Regards,
+SmartMeetingAI
+"""
+    }
     attendees = [pending["sender"]]
 
     if "participants" in pending:

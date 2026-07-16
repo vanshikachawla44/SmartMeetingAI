@@ -19,16 +19,50 @@ def get_datetime(day, time_string):
     # -----------------------------
     # today / tomorrow
     # -----------------------------
+    # -----------------------------
+    # Relative Dates
+    # -----------------------------
+        # -----------------------------
+    # Relative Dates
+    # -----------------------------
+
+    meeting_date = None
+
     if day == "today":
         meeting_date = today
 
     elif day == "tomorrow":
         meeting_date = today + timedelta(days=1)
+
+    elif day == "day after tomorrow":
+        meeting_date = today + timedelta(days=2)
+
+    elif day == "next week":
+        meeting_date = today + timedelta(days=7)
+
+    elif day == "next month":
+
+        month = today.month + 1
+        year = today.year
+
+        if month > 12:
+            month = 1
+            year += 1
+
+        meeting_date = today.replace(
+            year=year,
+            month=month,
+            day=min(today.day, 28)
+        )
+
+    elif day == "next year":
+
+        meeting_date = today.replace(
+            year=today.year + 1
+        )
+
     else:
 
-        # -----------------------------
-        # next / this
-        # -----------------------------
         is_next = False
         is_this = False
 
@@ -40,14 +74,14 @@ def get_datetime(day, time_string):
             is_this = True
             day = day.replace("this ", "").strip()
 
-        # -----------------------------
-        # Short weekdays
-        # -----------------------------
         short_days = {
             "mon": "monday",
             "tue": "tuesday",
+            "tues": "tuesday",
             "wed": "wednesday",
             "thu": "thursday",
+            "thur": "thursday",
+            "thurs": "thursday",
             "fri": "friday",
             "sat": "saturday",
             "sun": "sunday"
@@ -56,38 +90,45 @@ def get_datetime(day, time_string):
         if day in short_days:
             day = short_days[day]
 
-        # -----------------------------
-        # Try actual dates first
-        # -----------------------------
-        meeting_date = None
+    if meeting_date is None:
 
         date_formats = [
-            "%A, %d %b %Y",
+   
+         "%A, %d %b %Y",
             "%A, %d %B %Y",
+
             "%d %b %Y",
             "%d %B %Y",
+
             "%d %b",
             "%d %B",
+
             "%Y-%m-%d",
+
             "%d/%m/%Y",
-            "%d-%m-%Y",
-            "%d.%m.%Y",
-            "%m/%d/%Y",
-
             "%d/%m/%y",
-            "%d-%m-%y",
-            "%d.%m.%y",
-            "%m/%d/%y"
-]
 
-        for fmt in date_formats:
+            "%d-%m-%Y",
+            "%d-%m-%y",
+
+            "%d.%m.%Y",
+            "%d.%m.%y",
+
+            "%m/%d/%Y",
+            "%m/%d/%y"
+    ] 
+    for fmt in date_formats:
             try:
                 meeting_date = datetime.strptime(day, fmt)
-
                 # If year is not present, use current year
-                if "%Y" not in fmt:
+                if "%Y" not in fmt and "%y" not in fmt:
                     meeting_date = meeting_date.replace(year=today.year)
 
+                # Convert 2-digit year to 20xx if needed
+                elif "%y" in fmt and meeting_date.year < 2000:
+                    meeting_date = meeting_date.replace(
+                            year=2000 + (meeting_date.year % 100)
+    )
                 break
 
             except ValueError:
@@ -96,7 +137,7 @@ def get_datetime(day, time_string):
         # -----------------------------
         # Weekday handling
         # -----------------------------
-        if meeting_date is None:
+    if meeting_date is None:
 
             weekdays = {
                 "monday": 0,
@@ -114,23 +155,22 @@ def get_datetime(day, time_string):
             target_day = weekdays[day]
 
             days_ahead = target_day - today.weekday()
-
-            if days_ahead < 0:
-                days_ahead += 7
+            
 
             if is_next:
-
-                if days_ahead == 0:
-                    days_ahead = 7
-                else:
+                if days_ahead <= 0:
                     days_ahead += 7
 
-            elif not is_this:
+            elif is_this:
+                if days_ahead < 0:
+                    days_ahead += 7
 
-                if days_ahead == 0:
-                    days_ahead = 7
+            else:
+                if days_ahead <= 0:
+                    days_ahead += 7
 
-            meeting_date = today + timedelta(days=days_ahead)  
+            meeting_date = today + timedelta(days=days_ahead)
+ 
 
     # -----------------------------
     # Time Parsing
@@ -141,7 +181,9 @@ def get_datetime(day, time_string):
         "%I:%M %p",
         "%I %p",
         "%I:%M%p",
-        "%I%p"
+        "%I%p",
+        "%H:%M",
+        "%H"
     ]
 
     time_obj = None
