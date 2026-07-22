@@ -1,0 +1,38 @@
+name: SmartMeetingAI CI
+
+on:
+  push:
+    branches: [main]
+
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-verify:
+    name: Build and Verify SmartMeetingAI
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Verify Python Syntax
+        run: python -m compileall .
+
+      - name: Build Docker Image
+        run: docker build -t smartmeetingai:${{ github.sha }} .
+
+      - name: Verify Docker Image
+        run: docker images
