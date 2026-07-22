@@ -1,0 +1,36 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Git
+.git
+.gitignore
+
+# Environment
+.env
+
+# Secrets
+credentials.json
+token.pickle
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+processed_emails.txt
+
+# Tests
+test_*.py
+
+# Documentation
+README.md
+
+# OS files
+.DS_Store
+Thumbs.db
