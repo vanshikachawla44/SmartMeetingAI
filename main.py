@@ -1,3 +1,4 @@
+from rag.query_engine import ask_rag
 from pydantic import BaseModel
 from fastapi import FastAPI
 
@@ -17,6 +18,8 @@ app = FastAPI()
 class EmailRequest(BaseModel):
     email_text: str
 
+class QuestionRequest(BaseModel):
+    question: str
 
 @app.get("/")
 def home():
@@ -103,4 +106,14 @@ def add_test_meeting():
 
     return {
         "message": "Test meeting added successfully"
+    }
+
+@app.post("/ask")
+def ask_question(request: QuestionRequest):
+
+    answer = ask_rag(request.question)
+
+    return {
+        "question": request.question,
+        "answer": answer
     }
