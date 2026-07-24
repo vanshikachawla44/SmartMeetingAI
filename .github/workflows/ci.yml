@@ -55,7 +55,8 @@ jobs:
           script: |
             cd ~/SmartMeetingAI
 
-            git pull origin main
+            git fetch origin
+            git reset --hard origin/main
 
             docker compose down || true
             docker compose up --build -d
